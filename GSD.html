@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Shit Done (GSD) Board</title>
+    <style>
+        /* ==========================================================================
+           1. CSS Variables & Theme Setup
+           ========================================================================== */
+        :root[data-theme="dark"] {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --surface-hover: #334155;
+            --column-bg: rgba(30, 41, 59, 0.5);
+            --border-color: #334155;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+
+            --priority-low-bg: rgba(16, 185, 129, 0.15);
+            --priority-low-text: #34d399;
+            --priority-medium-bg: rgba(245, 158, 11, 0.15);
+            --priority-medium-text: #fbbf24;
+            --priority-high-bg: rgba(239, 68, 68, 0.15);
+            --priority-high-text: #f87171;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+            --modal-overlay-bg: rgba(15, 23, 42, 0.75);
+        }
+
+        :root[data-theme="light"] {
+            --bg-color: #f1f5f9;
+            --surface-color: #ffffff;
+            --surface-hover: #e2e8f0;
+            --column-bg: rgba(226, 232, 240, 0.6);
+            --border-color: #cbd5e1;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #059669;
+            --success-hover: #047857;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+
+            --priority-low-bg: rgba(16, 185, 129, 0.15);
+            --priority-low-text: #059669;
+            --priority-medium-bg: rgba(245, 158, 11, 0.15);
+            --priority-medium-text: #d97706;
+            --priority-high-bg: rgba(239, 68, 68, 0.15);
+            --priority-high-text: #dc2626;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+
+            --modal-overlay-bg: rgba(15, 23, 42, 0.4);
+        }
+
+        :root {
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dynamic Link Badge Themes */
+        .link-badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.55rem; font-size: 0.75rem; font-weight: 500; border-radius: var(--radius-sm); text-decoration: none; transition: var(--transition); border: 1px solid transparent; }
+        .link-badge-doc { background-color: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
+        .link-badge-doc:hover { background-color: rgba(56, 189, 248, 0.25); }
+        .link-badge-website { background-color: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3); }
+        .link-badge-website:hover { background-color: rgba(168, 85, 247, 0.25); }
+        .link-badge-email { background-color: rgba(255, 122, 89, 0.15); color: #ff7a59; border-color: rgba(255, 122, 89, 0.3); }
+        .link-badge-email:hover { background-color: rgba(255, 122, 89, 0.25); }
+        .link-badge-file { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
+        .link-badge-file:hover { background-color: rgba(34, 197, 94, 0.25); }
+
+        /* Custom Labels Styling */
+        .card-labels-container { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.2rem; }
+        .card-label-badge { font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px; color: #ffffff; letter-spacing: 0.02em; display: inline-flex; align-items: center; }
+        
+        .labels-editor-container { display: flex; flex-direction: column; gap: 0.5rem; }
+        .label-input-row { display: flex; gap: 0.5rem; align-items: center; }
+        .label-color-picker { width: 36px; height: 34px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 2px; cursor: pointer; background: var(--bg-color); flex-shrink: 0; }
+
+        /* ==========================================================================
+           2. Base & Layout
+           ========================================================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            padding: 1rem 1.5rem;
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .header-title { display: flex; align-items: center; gap: 0.75rem; }
+        .header-title h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.025em; }
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+        .board-container {
+            flex: 1;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+            overflow-x: auto;
+            height: calc(100vh - 75px);
+        }
+
+        /* ==========================================================================
+           3. Buttons & Controls
+           ========================================================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            font-size: 0.825rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary { background-color: var(--primary); color: #ffffff; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success); color: #ffffff; }
+        .btn-success:hover { background-color: var(--success-hover); }
+        .btn-secondary { background-color: var(--surface-hover); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background-color: var(--border-color); }
+
+        .btn-icon {
+            padding: 0.35rem;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-icon:hover { background-color: var(--surface-hover); color: var(--text-primary); }
+
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .theme-toggle-btn:hover { background-color: var(--surface-hover); }
+
+        /* ==========================================================================
+           4. Column Styles
+           ========================================================================== */
+        .column {
+            background-color: var(--column-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
+            height: 100%;
+            min-width: 320px;
+            width: 320px;
+            flex-shrink: 0;
+            backdrop-filter: blur(8px);
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .column.column-dragging { opacity: 0.4; transform: scale(0.98); }
+
+        .column-header {
+            padding: 1rem 1.25rem 0.75rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            cursor: grab;
+        }
+        .column-header:active { cursor: grabbing; }
+
+        .column-header-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+        
+        .column-title-input {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 0.2rem 0.4rem;
+            width: 100%;
+            outline: none;
+            transition: var(--transition);
+        }
+        .column-title-input:hover { border-color: var(--border-color); background-color: var(--bg-color); }
+        .column-title-input:focus { border-color: var(--primary); background-color: var(--bg-color); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+
+        .column-controls { display: flex; align-items: center; justify-content: space-between; gap: 0.25rem; width: 100%; }
+        .column-nav-btns { display: flex; align-items: center; gap: 0.2rem; }
+
+        .badge {
+            background-color: var(--surface-hover);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            border: 1px solid var(--border-color);
+        }
+
+        .task-list {
+            padding: 0.85rem;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-height: 100px;
+            transition: var(--transition);
+        }
+
+        .task-list.drag-over {
+            background-color: rgba(59, 130, 246, 0.08);
+            outline: 2px dashed var(--primary);
+            outline-offset: -8px;
+            border-radius: var(--radius-md);
+        }
+
+        /* ==========================================================================
+           5. Compact Card Layout
+           ========================================================================== */
+        .task-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.85rem;
+            box-shadow: var(--shadow-sm);
+            cursor: grab;
+            transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .task-card:hover { border-color: var(--text-muted); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .task-card:active { cursor: grabbing; }
+        .task-card.dragging { opacity: 0.4; transform: scale(0.98); }
+
+        .task-card-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+        .priority-tag { padding: 0.15rem 0.45rem; border-radius: var(--radius-sm); font-weight: 700; text-transform: uppercase; font-size: 0.625rem; letter-spacing: 0.05em; display: inline-block; }
+        .priority-low { background-color: var(--priority-low-bg); color: var(--priority-low-text); }
+        .priority-medium { background-color: var(--priority-medium-bg); color: var(--priority-medium-text); }
+        .priority-high { background-color: var(--priority-high-bg); color: var(--priority-high-text); }
+
+        .task-title-link {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.35;
+            word-break: break-word;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: text;
+        }
+        .task-title-link:hover { color: var(--primary); text-decoration: underline; }
+
+        .task-card-actions { display: flex; gap: 0.1rem; opacity: 0.6; transition: var(--transition); }
+        .task-card:hover .task-card-actions { opacity: 1; }
+
+        .task-single-line-preview {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            user-select: text;
+        }
+
+        .task-links-container { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+        .card-checklist { display: flex; flex-direction: column; gap: 0.35rem; padding-top: 0.25rem; border-top: 1px solid var(--border-color); }
+        .checklist-header-toggle { display: flex; justify-content: space-between; align-items: center; font-size: 0.725rem; color: var(--text-muted); }
+        .checklist-progress-bar { height: 4px; background-color: var(--bg-color); border-radius: 2px; overflow: hidden; }
+        .checklist-progress-fill { height: 100%; background-color: var(--primary); transition: width 0.3s ease; }
+
+        .checklist-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.775rem; color: var(--text-secondary); cursor: pointer; user-select: text; }
+        .checklist-item input[type="checkbox"] {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--text-muted);
+            border-radius: 3px;
+            background-color: var(--bg-color);
+            cursor: pointer;
+            display: grid;
+            place-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .checklist-item input[type="checkbox"]:checked { background-color: var(--primary); border-color: var(--primary); }
+        .checklist-item input[type="checkbox"]:checked::before { content: "✓"; font-size: 10px; color: white; font-weight: bold; }
+        .checklist-item.completed span { text-decoration: line-through; color: var(--text-muted); }
+
+        .task-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.35rem; font-size: 0.725rem; color: var(--text-muted); gap: 0.5rem; }
+        .date-badge { display: flex; align-items: center; gap: 0.25rem; }
+        .date-badge.overdue { color: var(--priority-high-text); font-weight: 700; }
+
+        .empty-state { text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.85rem; border: 1px dashed var(--border-color); border-radius: var(--radius-md); pointer-events: none; }
+
+        /* ==========================================================================
+           6. Modal Styles
+           ========================================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--modal-overlay-bg);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 680px;
+            max-height: 88vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal { transform: translateY(0); }
+
+        .modal-header { padding: 1.1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .modal-title-group { display: flex; align-items: center; gap: 0.75rem; }
+        .modal-title { font-size: 1.2rem; font-weight: 700; }
+
+        #task-form { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .modal-body { padding: 1.25rem 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.1rem; flex: 1; }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        .form-group label { font-size: 0.825rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 0.4rem; justify-content: space-between; }
+
+        .form-control {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.55rem 0.75rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.875rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .view-field-value {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            background-color: var(--bg-color);
+            padding: 0.6rem 0.8rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .view-field-value a { color: var(--primary); text-decoration: underline; }
+
+        .modal-checklist-list { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.5rem; }
+        .modal-checklist-row { display: flex; align-items: center; gap: 0.5rem; background-color: var(--bg-color); padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); }
+        .modal-checklist-row input[type="text"] { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 0.85rem; outline: none; }
+
+        .add-checklist-group { display: flex; gap: 0.5rem; }
+
+        /* Dynamic Multi-Link Editor */
+        .links-editor-container { display: flex; flex-direction: column; gap: 0.5rem; }
+        .link-input-row { display: flex; gap: 0.5rem; align-items: center; }
+
+        /* Comment Editor & Activity List */
+        .comment-editor-wrapper { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; flex-direction: column; overflow: hidden; transition: var(--transition); }
+        .comment-editor-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+
+        .rich-toolbar { display: flex; align-items: center; gap: 0.25rem; padding: 0.35rem 0.5rem; background-color: var(--surface-hover); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
+        .toolbar-btn { background: transparent; border: none; color: var(--text-secondary); padding: 0.25rem 0.4rem; font-size: 0.8rem; font-weight: 600; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .toolbar-btn:hover { background-color: var(--border-color); color: var(--text-primary); }
+
+        .rich-editor-input { min-height: 80px; max-height: 180px; padding: 0.65rem; color: var(--text-primary); font-size: 0.85rem; line-height: 1.5; outline: none; overflow-y: auto; white-space: normal; word-break: break-word; }
+        .rich-editor-input:empty::before { content: attr(placeholder); color: var(--text-muted); pointer-events: none; display: block; }
+        .rich-editor-input ul, .rich-editor-input ol, .comment-text ul, .comment-text ol, .rich-view-content ul, .rich-view-content ol { padding-left: 1.25rem; margin: 0.3rem 0; }
+        .rich-editor-input p, .comment-text p, .rich-view-content p { margin-bottom: 0.3rem; }
+        .rich-editor-input a, .comment-text a, .rich-view-content a { color: var(--primary); text-decoration: underline; }
+
+        .comment-editor-actions { display: flex; justify-content: flex-end; padding: 0.4rem 0.65rem; background-color: var(--surface-hover); border-top: 1px solid var(--border-color); gap: 0.5rem; }
+        .comments-list { display: flex; flex-direction: column; gap: 0.65rem; max-height: 220px; overflow-y: auto; margin-bottom: 0.5rem; padding-right: 0.25rem; }
+        .comment-item { background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.65rem 0.8rem; display: flex; flex-direction: column; gap: 0.35rem; position: relative; }
+        .comment-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.725rem; color: var(--text-muted); }
+        .comment-actions { display: flex; gap: 0.3rem; }
+        .comment-text { font-size: 0.825rem; color: var(--text-primary); line-height: 1.45; word-break: break-word; }
+
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 0.75rem; background-color: var(--surface-color); flex-shrink: 0; }
+
+        /* Custom Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 32px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); transition: .2s; border-radius: 18px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                <rect width="18" height="18" x="3" y="3" rx="2"/>
+                <path d="M8 7v10"/>
+                <path d="M12 7v6"/>
+                <path d="M16 7v8"/>
+            </svg>
+            <h1>Get Shit Done (GSD) Board</h1>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+                <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+            <button class="btn btn-secondary" id="manage-labels-header-btn" title="Manage Board Labels">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Manage Labels
+            </button>
+            <button class="btn btn-secondary" id="save-json-btn" title="Save JSON File Backup">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save File
+            </button>
+            <button class="btn btn-secondary" id="open-json-btn" title="Open JSON File Backup">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><polyline points="12 11 12 17 9 14"/><polyline points="12 17 15 14"/></svg>
+                Open File
+            </button>
+            <input type="file" id="json-file-input" accept=".json" style="display:none;">
+            <button class="btn btn-secondary" id="add-column-header-btn" title="New column">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Column
+            </button>
+            <button class="btn btn-success" id="export-csv-btn" title="Export all tasks to CSV spreadsheet">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+            </button>
+            <button class="btn btn-primary" id="add-task-header-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Task
+            </button>
+        </div>
+    </header>
+
+    <main class="board-container" id="board-container"></main>
+
+    <!-- Global Labels Management Modal -->
+    <div class="modal-overlay" id="labels-management-modal">
+        <div class="modal" style="max-width: 520px;">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h3 class="modal-title">Manage Board Labels</h3>
+                </div>
+                <button class="btn-icon" id="close-labels-modal-x-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.825rem; color:var(--text-secondary);">
+                    Modifying a label's name or color here will automatically propagate changes across all task cards on the board.
+                </p>
+                <div class="labels-editor-container" id="global-labels-list"></div>
+                <button type="button" class="btn btn-secondary" id="add-global-label-btn" style="align-self: flex-start; margin-top: 0.25rem;">+ Create New Label</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="save-labels-modal-btn">Save & Propagate Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Detail / Edit Modal -->
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h3 class="modal-title" id="modal-title-text">Task Details</h3>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <button type="button" class="btn btn-secondary" id="modal-edit-toggle-btn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        Edit
+                    </button>
+                    <button class="btn-icon" id="close-modal-x-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+            <form id="task-form">
+                <div class="modal-body" id="modal-body-container">
+                    <input type="hidden" id="task-id">
+                    
+                    <!-- Title Field -->
+                    <div class="form-group">
+                        <label for="task-title-input">Title *</label>
+                        <input type="text" id="task-title-input" class="form-control edit-mode-elem" placeholder="What needs to be done?" required autofocus>
+                        <div id="view-title" class="view-mode-elem view-field-value" style="font-weight: 700; font-size: 1.05rem;"></div>
+                    </div>
+
+                    <!-- Custom Labels Builder -->
+                    <div class="form-group">
+                        <label>
+                            <span>Labels</span>
+                            <button type="button" class="btn-icon edit-mode-elem" id="open-labels-modal-from-task" title="Manage Labels System" style="font-size:0.75rem; font-weight:normal; color:var(--primary);">
+                                Manage Global Labels
+                            </button>
+                        </label>
+                        <div class="edit-mode-elem">
+                            <div class="labels-editor-container" id="labels-editor-container"></div>
+                            <button type="button" class="btn btn-secondary" id="add-label-row-btn" style="margin-top:0.5rem;">+ Add Label to Task</button>
+                        </div>
+                        <div id="view-labels" class="view-mode-elem view-field-value"></div>
+                    </div>
+
+                    <!-- Priority & Status Fields -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-priority-input">Priority</label>
+                            <select id="task-priority-input" class="form-control edit-mode-elem">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                            <div id="view-priority" class="view-mode-elem view-field-value" style="text-transform: capitalize;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="task-status-input">Column</label>
+                            <select id="task-status-input" class="form-control edit-mode-elem"></select>
+                            <div id="view-status" class="view-mode-elem view-field-value"></div>
+                        </div>
+                    </div>
+
+                    <!-- Start Date & Due Date Fields -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-start-input">Start Date</label>
+                            <input type="date" id="task-start-input" class="form-control edit-mode-elem">
+                            <div id="view-start-date" class="view-mode-elem view-field-value"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="task-due-input">Due Date</label>
+                            <input type="date" id="task-due-input" class="form-control edit-mode-elem">
+                            <div id="view-due-date" class="view-mode-elem view-field-value"></div>
+                        </div>
+                    </div>
+
+                    <!-- Rich Text Notes Field -->
+                    <div class="form-group">
+                        <label>Notes / Description</label>
+                        <div class="edit-mode-elem">
+                            <div class="comment-editor-wrapper">
+                                <div class="rich-toolbar">
+                                    <button type="button" class="toolbar-btn" data-command="bold"><b>B</b></button>
+                                    <button type="button" class="toolbar-btn" data-command="insertUnorderedList">• List</button>
+                                    <button type="button" class="toolbar-btn" data-command="createLink">🔗 Link</button>
+                                </div>
+                                <div id="task-notes-editor" class="rich-editor-input" contenteditable="true" placeholder="Add detailed context, descriptions, or requirements..."></div>
+                            </div>
+                        </div>
+                        <div id="view-notes" class="view-mode-elem view-field-value rich-view-content"></div>
+                    </div>
+
+                    <!-- Dynamic Multi-Link Resource Builder -->
+                    <div class="form-group">
+                        <label>Resource Links</label>
+                        <div class="edit-mode-elem">
+                            <div class="links-editor-container" id="links-editor-container"></div>
+                            <button type="button" class="btn btn-secondary" id="add-link-row-btn" style="margin-top:0.5rem;">+ Add Resource Link</button>
+                        </div>
+                        <div id="view-links" class="view-mode-elem view-field-value"></div>
+                    </div>
+
+                    <!-- Interactive Checklist & Subtasks -->
+                    <div class="form-group">
+                        <label>
+                            <span>Subtasks Checklist</span>
+                            <span style="font-size: 0.75rem; font-weight: normal; display: flex; align-items: center; gap: 0.35rem;">
+                                Hide completed
+                                <label class="switch">
+                                    <input type="checkbox" id="modal-hide-completed-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </span>
+                        </label>
+                        <div class="modal-checklist-list" id="modal-checklist-container"></div>
+                        <div class="add-checklist-group edit-mode-elem">
+                            <input type="text" id="new-checklist-input" class="form-control" placeholder="Add a subtask...">
+                            <button type="button" class="btn btn-secondary" id="add-subtask-btn">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Rich Text Comments & Activity Lifecycle -->
+                    <div class="form-group">
+                        <label>Comments & Activity</label>
+                        <div class="comments-list" id="modal-comments-container"></div>
+                        
+                        <div class="comment-editor-wrapper">
+                            <div class="rich-toolbar">
+                                <button type="button" class="toolbar-btn" id="comment-bold-btn"><b>B</b></button>
+                                <button type="button" class="toolbar-btn" id="comment-list-btn">• List</button>
+                                <button type="button" class="toolbar-btn" id="comment-link-btn">🔗 Link</button>
+                            </div>
+                            <div id="new-comment-editor" class="rich-editor-input" contenteditable="true" placeholder="Write a comment..."></div>
+                            <div class="comment-editor-actions">
+                                <button type="button" class="btn btn-secondary" id="cancel-edit-comment-btn" style="display:none; padding: 0.35rem 0.75rem; font-size: 0.8rem;">Cancel Edit</button>
+                                <button type="button" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;" id="save-comment-btn">Save Comment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="close-modal-cancel-btn">Close</button>
+                    <button type="submit" class="btn btn-primary edit-mode-elem" id="save-task-submit-btn">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. Application State & LocalStorage Persistence
+           ========================================================================== */
+        const STORAGE_KEY_TASKS = 'kanban_board_tasks_v10';
+        const STORAGE_KEY_COLUMNS = 'kanban_board_columns_v10';
+        const STORAGE_KEY_LABELS = 'kanban_board_labels_v10';
+        const STORAGE_KEY_THEME = 'kanban_board_theme_v10';
+        
+        let columns = [];
+        let tasks = [];
+        let globalLabels = [];
+        let draggedTaskId = null;
+        let draggedColumnId = null;
+        
+        let currentModalMode = 'view';
+        let currentModalChecklist = [];
+        let currentModalComments = [];
+        let currentModalLinks = [];
+        let currentModalLabels = [];
+        let editingCommentId = null;
+
+        const PRIORITY_WEIGHTS = { high: 3, medium: 2, low: 1 };
+
+        // Updated Resource Link Types
+        const LINK_TYPES = [
+            { id: 'doc', label: 'Document', class: 'link-badge-doc' },
+            { id: 'website', label: 'Website', class: 'link-badge-website' },
+            { id: 'email', label: 'Email', class: 'link-badge-email' },
+            { id: 'file', label: 'File Location', class: 'link-badge-file' }
+        ];
+
+        const defaultColumns = [
+            { id: 'todo', title: 'To Do' },
+            { id: 'in-progress', title: 'In Progress' },
+            { id: 'review', title: 'Review' },
+            { id: 'done', title: 'Done' }
+        ];
+
+        const defaultGlobalLabels = [
+            { id: 'lbl_strategy', name: 'Strategy', color: '#3b82f6' },
+            { id: 'lbl_q3', name: 'Q3 Goal', color: '#8b5cf6' },
+            { id: 'lbl_bug', name: 'Bug', color: '#ef4444' },
+            { id: 'lbl_feature', name: 'Feature', color: '#10b981' }
+        ];
+
+        const defaultTasks = [
+            {
+                id: '1',
+                title: 'Finalize Q3 Product Strategy',
+                notes: '<p>Align with sales team on client requirements, tech feasibility, and feature timelines across quarters.</p>',
+                priority: 'high',
+                status: 'in-progress',
+                startDate: '2026-08-15',
+                dueDate: '2026-08-25',
+                hideCompleted: false,
+                labels: [
+                    { id: 'lbl_strategy', name: 'Strategy', color: '#3b82f6' },
+                    { id: 'lbl_q3', name: 'Q3 Goal', color: '#8b5cf6' }
+                ],
+                links: [
+                    { type: 'doc', url: 'https://docs.google.com/document/sample-strategy', title: 'Strategy Briefing' },
+                    { type: 'website', url: 'https://example.com/roadmap', title: 'Roadmap Site' }
+                ],
+                checklist: [
+                    { id: 'c1', text: 'Gather client feedback', completed: true },
+                    { id: 'c2', text: 'Draft roadmap presentation', completed: false },
+                    { id: 'c3', text: 'Review budget allocation', completed: false }
+                ],
+                comments: [
+                    { id: 'cm1', text: '<p>Initial roadmap draft uploaded to <b>Google Docs</b>.</p>', timestamp: 'Aug 19, 2026, 02:30 PM' }
+                ]
+            }
+        ];
+
+        /* ==========================================================================
+           2. DOM XSS Sanitization Engine & Safety Checks
+           ========================================================================== */
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag));
+        }
+
+        function cleanHTML(htmlInput) {
+            if (!htmlInput) return '';
+            const temp = document.createElement('div');
+            temp.innerHTML = htmlInput;
+
+            const allowedTags = ['P', 'B', 'STRONG', 'UL', 'OL', 'LI', 'BR', 'A', 'DIV', 'SPAN'];
+
+            function sanitizeNode(node) {
+                const children = Array.from(node.childNodes);
+                children.forEach(child => {
+                    if (child.nodeType === Node.ELEMENT_NODE) {
+                        if (!allowedTags.includes(child.nodeName)) {
+                            const text = document.createTextNode(child.textContent);
+                            node.replaceChild(text, child);
+                        } else {
+                            Array.from(child.attributes).forEach(attr => {
+                                const attrName = attr.name.toLowerCase();
+                                const attrValue = attr.value.toLowerCase();
+                                if (attrName.startsWith('on') || attrValue.startsWith('javascript:')) {
+                                    child.removeAttribute(attr.name);
+                                }
+                            });
+                            if (child.nodeName === 'A') {
+                                child.setAttribute('target', '_blank');
+                                child.setAttribute('rel', 'noopener noreferrer');
+                            }
+                            sanitizeNode(child);
+                        }
+                    }
+                });
+            }
+
+            sanitizeNode(temp);
+            return temp.innerHTML;
+        }
+
+        function isValidURL(url) {
+            if (!url) return false;
+            try {
+                // Allow web URLs, mailto, and file paths
+                if (url.startsWith('mailto:') || url.startsWith('file:')) return true;
+                const parsed = new URL(url);
+                return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function sanitizeCSVFormula(val) {
+            if (val === null || val === undefined) return '';
+            const str = String(val);
+            if (/^[=+\-@\t\r]/.test(str)) {
+                return "'" + str;
+            }
+            return str;
+        }
+
+        /* ==========================================================================
+           3. Core Initialization & Theme Engine
+           ========================================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadBoardData();
+            renderBoard();
+            setupEventDelegation();
+        });
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'dark';
+            applyTheme(savedTheme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            
+            if (theme === 'light') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+            localStorage.setItem(STORAGE_KEY_THEME, theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        }
+
+        function loadBoardData() {
+            const savedColumns = localStorage.getItem(STORAGE_KEY_COLUMNS);
+            if (savedColumns) {
+                try { columns = JSON.parse(savedColumns); } 
+                catch (e) { columns = defaultColumns; }
+            } else {
+                columns = defaultColumns;
+                saveColumnsToStorage();
+            }
+
+            const savedLabels = localStorage.getItem(STORAGE_KEY_LABELS);
+            if (savedLabels) {
+                try { globalLabels = JSON.parse(savedLabels); } 
+                catch (e) { globalLabels = defaultGlobalLabels; }
+            } else {
+                globalLabels = defaultGlobalLabels;
+                saveLabelsToStorage();
+            }
+
+            const savedTasks = localStorage.getItem(STORAGE_KEY_TASKS);
+            if (savedTasks) {
+                try { tasks = JSON.parse(savedTasks); } 
+                catch (e) { tasks = defaultTasks; }
+            } else {
+                tasks = defaultTasks;
+                saveTasksToStorage();
+            }
+        }
+
+        function saveTasksToStorage() { localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks)); }
+        function saveColumnsToStorage() { localStorage.setItem(STORAGE_KEY_COLUMNS, JSON.stringify(columns)); }
+        function saveLabelsToStorage() { localStorage.setItem(STORAGE_KEY_LABELS, JSON.stringify(globalLabels)); }
+
+        /* ==========================================================================
+           4. Global Labels Management & Propagation
+           ========================================================================== */
+        function openLabelsManagementModal() {
+            renderGlobalLabelsList();
+            document.getElementById('labels-management-modal').classList.add('active');
+        }
+
+        function closeLabelsManagementModal() {
+            document.getElementById('labels-management-modal').classList.remove('active');
+        }
+
+        function renderGlobalLabelsList() {
+            const container = document.getElementById('global-labels-list');
+            container.innerHTML = '';
+
+            globalLabels.forEach(lbl => {
+                const row = document.createElement('div');
+                row.className = 'label-input-row';
+                row.dataset.id = lbl.id;
+
+                row.innerHTML = `
+                    <input type="text" class="form-control global-label-name-input" value="${escapeHTML(lbl.name)}" placeholder="Label Name" style="flex:1;">
+                    <input type="color" class="label-color-picker global-label-color-picker" value="${escapeHTML(lbl.color || '#3b82f6')}">
+                    <button type="button" class="btn-icon remove-global-label-btn" title="Delete Label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addGlobalLabelRow() {
+            const container = document.getElementById('global-labels-list');
+            const newId = 'lbl_' + Date.now().toString(36);
+            const row = document.createElement('div');
+            row.className = 'label-input-row';
+            row.dataset.id = newId;
+
+            row.innerHTML = `
+                <input type="text" class="form-control global-label-name-input" value="New Label" placeholder="Label Name" style="flex:1;">
+                <input type="color" class="label-color-picker global-label-color-picker" value="#3b82f6">
+                <button type="button" class="btn-icon remove-global-label-btn" title="Delete Label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        function saveAndPropagateLabels() {
+            const rows = document.querySelectorAll('#global-labels-list .label-input-row');
+            const updatedGlobalLabels = [];
+            const labelMap = new Map();
+
+            rows.forEach(row => {
+                const id = row.dataset.id;
+                const name = row.querySelector('.global-label-name-input').value.trim();
+                const color = row.querySelector('.global-label-color-picker').value;
+
+                if (name) {
+                    const labelObj = { id, name, color };
+                    updatedGlobalLabels.push(labelObj);
+                    labelMap.set(id, labelObj);
+                }
+            });
+
+            globalLabels = updatedGlobalLabels;
+            saveLabelsToStorage();
+
+            // Propagate through all tasks on the board
+            tasks.forEach(task => {
+                if (task.labels && task.labels.length > 0) {
+                    const propagatedLabels = [];
+                    task.labels.forEach(lbl => {
+                        if (lbl.id && labelMap.has(lbl.id)) {
+                            // Update with modified name & color
+                            propagatedLabels.push({ ...labelMap.get(lbl.id) });
+                        } else if (!lbl.id) {
+                            // Fallback for older labels matched by name
+                            const matched = globalLabels.find(g => g.name.toLowerCase() === lbl.name.toLowerCase());
+                            if (matched) {
+                                propagatedLabels.push({ ...matched });
+                            } else {
+                                propagatedLabels.push(lbl);
+                            }
+                        }
+                    });
+                    task.labels = propagatedLabels;
+                }
+            });
+
+            saveTasksToStorage();
+            renderBoard();
+            closeLabelsManagementModal();
+
+            // Refresh task modal if open
+            if (document.getElementById('task-modal').classList.contains('active')) {
+                renderLabelsEditor();
+                renderModalLabelsView();
+            }
+        }
+
+        /* ==========================================================================
+           5. Column Management
+           ========================================================================== */
+        function addNewColumn() {
+            const title = prompt('Enter column title:');
+            if (!title || !title.trim()) return;
+
+            const newColId = 'col_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+            columns.push({ id: newColId, title: title.trim() });
+            saveColumnsToStorage();
+            renderBoard();
+        }
+
+        function updateColumnTitle(columnId, newTitle) {
+            const trimmed = newTitle.trim();
+            const col = columns.find(c => c.id === columnId);
+            if (!col || !trimmed) { renderBoard(); return; }
+            col.title = trimmed;
+            saveColumnsToStorage();
+            renderBoard();
+        }
+
+        function deleteColumn(columnId) {
+            if (columns.length <= 1) {
+                alert('You must keep at least one column on the board.');
+                return;
+            }
+            const colTasks = tasks.filter(t => t.status === columnId);
+            const col = columns.find(c => c.id === columnId);
+            const colName = col ? col.title : 'this column';
+
+            let confirmMessage = `Are you sure you want to delete "${colName}"?`;
+            if (colTasks.length > 0) {
+                confirmMessage = `The column "${colName}" contains ${colTasks.length} task(s). Deleting it will permanently delete all these tasks. Proceed?`;
+            }
+
+            if (confirm(confirmMessage)) {
+                columns = columns.filter(c => c.id !== columnId);
+                tasks = tasks.filter(t => t.status !== columnId);
+                saveColumnsToStorage();
+                saveTasksToStorage();
+                renderBoard();
+            }
+        }
+
+        function moveColumn(columnId, direction) {
+            const index = columns.findIndex(c => c.id === columnId);
+            if (index === -1) return;
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= columns.length) return;
+
+            const temp = columns[index];
+            columns[index] = columns[newIndex];
+            columns[newIndex] = temp;
+
+            saveColumnsToStorage();
+            renderBoard();
+        }
+
+        /* ==========================================================================
+           6. Backup & CSV Engine
+           ========================================================================== */
+        function saveJSONBackup() {
+            const backupData = { columns, globalLabels, tasks, exportDate: new Date().toISOString() };
+            const jsonStr = JSON.stringify(backupData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = `kanban_board_backup_${new Date().toISOString().split('T')[0]}.json`;
+            anchor.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function openJSONBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data && Array.isArray(data.columns) && Array.isArray(data.tasks)) {
+                        columns = data.columns;
+                        tasks = data.tasks;
+                        if (Array.isArray(data.globalLabels)) globalLabels = data.globalLabels;
+                        saveColumnsToStorage();
+                        saveLabelsToStorage();
+                        saveTasksToStorage();
+                        renderBoard();
+                        alert('Board backup restored successfully!');
+                    } else {
+                        alert('Invalid JSON backup file structure.');
+                    }
+                } catch (err) {
+                    alert('Failed to parse backup JSON file.');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        function exportTasksToCSV() {
+            if (tasks.length === 0) { alert('No tasks available to export.'); return; }
+
+            const headers = [
+                'ID', 'Title', 'Column Name', 'Status ID', 'Priority',
+                'Start Date', 'Due Date', 'Labels', 'Notes', 'Resource Links',
+                'Subtasks Summary', 'Subtasks Detail', 'Comments'
+            ];
+
+            const rows = tasks.map(t => {
+                const col = columns.find(c => c.id === t.status);
+                const colTitle = col ? col.title : t.status;
+
+                const totalSubtasks = t.checklist ? t.checklist.length : 0;
+                const completedSubtasks = t.checklist ? t.checklist.filter(c => c.completed).length : 0;
+
+                const labelsDetail = t.labels
+                    ? t.labels.map(l => l.name).join(' | ')
+                    : '';
+
+                const subtasksDetail = t.checklist 
+                    ? t.checklist.map(c => `[${c.completed ? 'x' : ' '}] ${c.text}`).join('; ')
+                    : '';
+
+                const linksDetail = t.links
+                    ? t.links.map(l => `${l.title || l.type}: ${l.url}`).join(' | ')
+                    : '';
+
+                const commentsDetail = t.comments 
+                    ? t.comments.map(cm => {
+                        const temp = document.createElement('div');
+                        temp.innerHTML = cm.text;
+                        return `${cm.timestamp}: ${temp.textContent || temp.innerText || ''}`;
+                    }).join(' | ')
+                    : '';
+
+                const tempNotes = document.createElement('div');
+                tempNotes.innerHTML = t.notes || '';
+                const plainNotes = tempNotes.textContent || tempNotes.innerText || '';
+
+                return [
+                    sanitizeCSVFormula(t.id),
+                    sanitizeCSVFormula(t.title),
+                    sanitizeCSVFormula(colTitle),
+                    sanitizeCSVFormula(t.status),
+                    sanitizeCSVFormula(t.priority),
+                    sanitizeCSVFormula(t.startDate),
+                    sanitizeCSVFormula(t.dueDate),
+                    sanitizeCSVFormula(labelsDetail),
+                    sanitizeCSVFormula(plainNotes),
+                    sanitizeCSVFormula(linksDetail),
+                    sanitizeCSVFormula(`${completedSubtasks}/${totalSubtasks}`),
+                    sanitizeCSVFormula(subtasksDetail),
+                    sanitizeCSVFormula(commentsDetail)
+                ];
+            });
+
+            const csvContent = [headers, ...rows].map(row => {
+                return row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',');
+            }).join('\r\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = `kanban_board_export_${new Date().toISOString().split('T')[0]}.csv`;
+            anchor.click();
+            URL.revokeObjectURL(url);
+        }
+
+        /* ==========================================================================
+           7. Board & Card Rendering Engine
+           ========================================================================== */
+        function renderBoard() {
+            const container = document.getElementById('board-container');
+            container.innerHTML = '';
+
+            columns.forEach((col, index) => {
+                const columnEl = document.createElement('section');
+                columnEl.className = 'column';
+                columnEl.dataset.colId = col.id;
+
+                const columnTasks = tasks
+                    .filter(t => t.status === col.id)
+                    .sort((a, b) => (PRIORITY_WEIGHTS[b.priority] || 0) - (PRIORITY_WEIGHTS[a.priority] || 0));
+
+                columnEl.innerHTML = `
+                    <div class="column-header" draggable="true" data-col-id="${col.id}">
+                        <div class="column-header-top">
+                            <input type="text" class="column-title-input" data-col-id="${col.id}" value="${escapeHTML(col.title)}" title="Click to rename column">
+                            <span class="badge">${columnTasks.length}</span>
+                        </div>
+                        <div class="column-controls">
+                            <div class="column-nav-btns">
+                                <button class="btn-icon move-col-btn" data-col-id="${col.id}" data-dir="-1" title="Move Left" ${index === 0 ? 'disabled style="opacity:0.3;"' : ''}>←</button>
+                                <button class="btn-icon move-col-btn" data-col-id="${col.id}" data-dir="1" title="Move Right" ${index === columns.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>→</button>
+                            </div>
+                            <div style="display:flex; gap:0.2rem;">
+                                <button class="btn-icon add-column-task-btn" data-status="${col.id}" title="Add Task to ${escapeHTML(col.title)}">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </button>
+                                <button class="btn-icon delete-column-btn" data-col-id="${col.id}" title="Delete Column">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-list" id="${col.id}"></div>
+                `;
+
+                const taskListEl = columnEl.querySelector('.task-list');
+
+                if (columnTasks.length === 0) {
+                    taskListEl.innerHTML = `<div class="empty-state">No tasks in this column</div>`;
+                } else {
+                    columnTasks.forEach(task => taskListEl.appendChild(createTaskCardElement(task)));
+                }
+
+                container.appendChild(columnEl);
+            });
+
+            populateModalColumnOptions();
+        }
+
+        function populateModalColumnOptions() {
+            const selectEl = document.getElementById('task-status-input');
+            if (!selectEl) return;
+            selectEl.innerHTML = '';
+            columns.forEach(col => {
+                const opt = document.createElement('option');
+                opt.value = col.id;
+                opt.textContent = col.title;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function createTaskCardElement(task) {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.draggable = true;
+            card.dataset.id = task.id;
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = task.notes || '';
+            const plainNotes = tempDiv.textContent || tempDiv.innerText || '';
+
+            // Custom Labels Badges
+            let labelsHTML = '';
+            if (task.labels && task.labels.length > 0) {
+                labelsHTML = `<div class="card-labels-container">`;
+                task.labels.forEach(lbl => {
+                    labelsHTML += `<span class="card-label-badge" style="background-color: ${escapeHTML(lbl.color || '#3b82f6')};">${escapeHTML(lbl.name)}</span>`;
+                });
+                labelsHTML += `</div>`;
+            }
+
+            // Named Resource Links Badges
+            let linksHTML = '';
+            if (task.links && task.links.length > 0) {
+                linksHTML = `<div class="task-links-container">`;
+                task.links.forEach(l => {
+                    if (isValidURL(l.url)) {
+                        const typeObj = LINK_TYPES.find(t => t.id === l.type) || LINK_TYPES[0];
+                        const displayName = l.title ? l.title : typeObj.label;
+                        linksHTML += `
+                            <a href="${escapeHTML(l.url)}" target="_blank" rel="noopener noreferrer" class="link-badge ${typeObj.class}" onclick="event.stopPropagation()">
+                                🔗 ${escapeHTML(displayName)}
+                            </a>`;
+                    }
+                });
+                linksHTML += `</div>`;
+            }
+
+            // Subtask Checklist
+            let checklistHTML = '';
+            const totalSubtasks = task.checklist ? task.checklist.length : 0;
+            const completedSubtasks = task.checklist ? task.checklist.filter(c => c.completed).length : 0;
+
+            if (totalSubtasks > 0) {
+                const percent = Math.round((completedSubtasks / totalSubtasks) * 100);
+                const itemsToDisplay = task.hideCompleted 
+                    ? task.checklist.filter(c => !c.completed)
+                    : task.checklist;
+
+                checklistHTML = `
+                    <div class="card-checklist">
+                        <div class="checklist-header-toggle">
+                            <span>Subtasks (${completedSubtasks}/${totalSubtasks})</span>
+                        </div>
+                        <div class="checklist-progress-bar">
+                            <div class="checklist-progress-fill" style="width: ${percent}%;"></div>
+                        </div>
+                `;
+                itemsToDisplay.forEach(item => {
+                    checklistHTML += `
+                        <label class="checklist-item ${item.completed ? 'completed' : ''}" onclick="event.stopPropagation()">
+                            <input type="checkbox" class="subtask-checkbox" data-task-id="${task.id}" data-subtask-id="${item.id}" ${item.completed ? 'checked' : ''}>
+                            <span>${escapeHTML(item.text)}</span>
+                        </label>
+                    `;
+                });
+                checklistHTML += `</div>`;
+            }
+
+            // Dates & Footer
+            const today = new Date().toISOString().split('T')[0];
+            let dateHTML = '';
+            if (task.dueDate) {
+                const isOverdue = task.dueDate < today && task.status !== 'done';
+                dateHTML = `
+                    <span class="date-badge ${isOverdue ? 'overdue' : ''}" title="Due Date">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        ${formatDate(task.dueDate)}
+                    </span>
+                `;
+            }
+
+            const commentCount = task.comments ? task.comments.length : 0;
+
+            card.innerHTML = `
+                <div class="task-card-top">
+                    <span class="priority-tag priority-${task.priority}">${task.priority}</span>
+                    <div class="task-card-actions">
+                        <button class="btn-icon edit-task-btn" data-id="${task.id}" title="Edit Task Direct">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </button>
+                        <button class="btn-icon delete-task-btn" data-id="${task.id}" title="Delete Task">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                </div>
+                ${labelsHTML}
+                <div class="task-title-link view-task-btn" data-id="${task.id}">${escapeHTML(task.title)}</div>
+                ${plainNotes ? `<div class="task-single-line-preview">${escapeHTML(plainNotes)}</div>` : ''}
+                ${linksHTML}
+                ${checklistHTML}
+                <div class="task-footer">
+                    ${dateHTML}
+                    ${commentCount > 0 ? `
+                        <span style="display:flex; align-items:center; gap:0.25rem;" title="${commentCount} comments">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            ${commentCount}
+                        </span>
+                    ` : ''}
+                </div>
+            `;
+
+            return card;
+        }
+
+        /* ==========================================================================
+           8. Event Delegation & Drag/Drop Engine
+           ========================================================================== */
+        function setupEventDelegation() {
+            const boardContainer = document.getElementById('board-container');
+
+            boardContainer.addEventListener('click', (e) => {
+                const viewBtn = e.target.closest('.view-task-btn');
+                if (viewBtn) { openModal('view', null, viewBtn.dataset.id); return; }
+
+                const editBtn = e.target.closest('.edit-task-btn');
+                if (editBtn) { openModal('edit', null, editBtn.dataset.id); return; }
+
+                const deleteBtn = e.target.closest('.delete-task-btn');
+                if (deleteBtn) { deleteTask(deleteBtn.dataset.id); return; }
+
+                const addColTaskBtn = e.target.closest('.add-column-task-btn');
+                if (addColTaskBtn) { openModal('create', addColTaskBtn.dataset.status); return; }
+
+                const deleteColBtn = e.target.closest('.delete-column-btn');
+                if (deleteColBtn) { deleteColumn(deleteColBtn.dataset.colId); return; }
+
+                const moveColBtn = e.target.closest('.move-col-btn');
+                if (moveColBtn) { moveColumn(moveColBtn.dataset.colId, parseInt(moveColBtn.dataset.dir, 10)); return; }
+            });
+
+            boardContainer.addEventListener('change', (e) => {
+                if (e.target.classList.contains('column-title-input')) {
+                    updateColumnTitle(e.target.dataset.colId, e.target.value);
+                } else if (e.target.classList.contains('subtask-checkbox')) {
+                    toggleCardSubtask(e.target.dataset.taskId, e.target.dataset.subtaskId);
+                }
+            });
+
+            boardContainer.addEventListener('keydown', (e) => {
+                if (e.target.classList.contains('column-title-input') && e.key === 'Enter') {
+                    e.target.blur();
+                }
+            });
+
+            // Card & Column Drag and Drop Logic
+            boardContainer.addEventListener('dragstart', (e) => {
+                const card = e.target.closest('.task-card');
+                const colHeader = e.target.closest('.column-header');
+
+                if (window.getSelection().toString().length > 0) {
+                    e.preventDefault();
+                    return;
+                }
+
+                if (card) {
+                    draggedTaskId = card.dataset.id;
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', 'card:' + draggedTaskId);
+                } else if (colHeader) {
+                    draggedColumnId = colHeader.dataset.colId;
+                    const col = colHeader.closest('.column');
+                    if (col) col.classList.add('column-dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', 'col:' + draggedColumnId);
+                }
+            });
+
+            boardContainer.addEventListener('dragend', (e) => {
+                document.querySelectorAll('.task-card').forEach(c => c.classList.remove('dragging'));
+                document.querySelectorAll('.column').forEach(c => c.classList.remove('column-dragging'));
+                document.querySelectorAll('.task-list').forEach(l => l.classList.remove('drag-over'));
+                draggedTaskId = null;
+                draggedColumnId = null;
+            });
+
+            boardContainer.addEventListener('dragover', (e) => {
+                const list = e.target.closest('.task-list');
+                const col = e.target.closest('.column');
+                if (list || col) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                }
+            });
+
+            boardContainer.addEventListener('dragenter', (e) => {
+                const list = e.target.closest('.task-list');
+                if (list) { e.preventDefault(); list.classList.add('drag-over'); }
+            });
+
+            boardContainer.addEventListener('dragleave', (e) => {
+                const list = e.target.closest('.task-list');
+                if (list && e.relatedTarget && !list.contains(e.relatedTarget)) {
+                    list.classList.remove('drag-over');
+                }
+            });
+
+            boardContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const dropData = e.dataTransfer.getData('text/plain');
+
+                if (dropData.startsWith('card:')) {
+                    const list = e.target.closest('.task-list');
+                    if (list) {
+                        list.classList.remove('drag-over');
+                        const targetStatus = list.id;
+                        const taskId = dropData.replace('card:', '');
+                        const task = tasks.find(t => t.id === taskId);
+                        if (task) {
+                            task.status = targetStatus;
+                            saveTasksToStorage();
+                            renderBoard();
+                        }
+                    }
+                } else if (dropData.startsWith('col:')) {
+                    const targetCol = e.target.closest('.column');
+                    if (targetCol) {
+                        const targetColId = targetCol.dataset.colId;
+                        const sourceColId = dropData.replace('col:', '');
+                        if (sourceColId !== targetColId) {
+                            const srcIdx = columns.findIndex(c => c.id === sourceColId);
+                            const tgtIdx = columns.findIndex(c => c.id === targetColId);
+                            if (srcIdx !== -1 && tgtIdx !== -1) {
+                                const [movedCol] = columns.splice(srcIdx, 1);
+                                columns.splice(tgtIdx, 0, movedCol);
+                                saveColumnsToStorage();
+                                renderBoard();
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Header Action Listeners
+            document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+            document.getElementById('manage-labels-header-btn').addEventListener('click', openLabelsManagementModal);
+            document.getElementById('save-json-btn').addEventListener('click', saveJSONBackup);
+            document.getElementById('open-json-btn').addEventListener('click', () => document.getElementById('json-file-input').click());
+            document.getElementById('json-file-input').addEventListener('change', openJSONBackup);
+            document.getElementById('add-column-header-btn').addEventListener('click', addNewColumn);
+            document.getElementById('export-csv-btn').addEventListener('click', exportTasksToCSV);
+            document.getElementById('add-task-header-btn').addEventListener('click', () => openModal('create'));
+
+            // Global Labels Modal
+            document.getElementById('close-labels-modal-x-btn').addEventListener('click', closeLabelsManagementModal);
+            document.getElementById('add-global-label-btn').addEventListener('click', addGlobalLabelRow);
+            document.getElementById('save-labels-modal-btn').addEventListener('click', saveAndPropagateLabels);
+            document.getElementById('open-labels-modal-from-task').addEventListener('click', openLabelsManagementModal);
+
+            document.getElementById('global-labels-list').addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.remove-global-label-btn');
+                if (removeBtn) {
+                    const row = removeBtn.closest('.label-input-row');
+                    if (row) row.remove();
+                }
+            });
+
+            // Modal Controls & Form Listeners
+            document.getElementById('close-modal-x-btn').addEventListener('click', closeModal);
+            document.getElementById('close-modal-cancel-btn').addEventListener('click', closeModal);
+            document.getElementById('task-modal').addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) closeModal();
+            });
+
+            document.getElementById('labels-management-modal').addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) closeLabelsManagementModal();
+            });
+
+            document.getElementById('modal-edit-toggle-btn').addEventListener('click', () => {
+                setModalDisplayMode(currentModalMode === 'view' ? 'edit' : 'view');
+            });
+
+            document.getElementById('task-form').addEventListener('submit', saveTask);
+            document.getElementById('add-subtask-btn').addEventListener('click', addChecklistItemFromInput);
+            document.getElementById('add-label-row-btn').addEventListener('click', () => addLabelRow());
+            document.getElementById('add-link-row-btn').addEventListener('click', () => addLinkRow());
+            document.getElementById('save-comment-btn').addEventListener('click', saveCommentFromEditor);
+            document.getElementById('cancel-edit-comment-btn').addEventListener('click', resetCommentEditor);
+
+            document.getElementById('modal-hide-completed-toggle').addEventListener('change', (e) => {
+                const taskId = document.getElementById('task-id').value;
+                if (taskId) {
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.hideCompleted = e.target.checked;
+                        saveTasksToStorage();
+                    }
+                }
+                renderModalChecklist();
+                renderBoard();
+            });
+
+            // Rich Text Toolbar Binding
+            document.querySelectorAll('.rich-toolbar .toolbar-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const cmd = btn.dataset.command;
+                    if (cmd === 'createLink') {
+                        const url = prompt('Enter URL:');
+                        if (url) document.execCommand('createLink', false, url);
+                    } else if (cmd) {
+                        document.execCommand(cmd, false, null);
+                    }
+                });
+            });
+
+            document.getElementById('comment-bold-btn').addEventListener('click', () => document.execCommand('bold'));
+            document.getElementById('comment-list-btn').addEventListener('click', () => document.execCommand('insertUnorderedList'));
+            document.getElementById('comment-link-btn').addEventListener('click', () => {
+                const url = prompt('Enter link URL:');
+                if (url) document.execCommand('createLink', false, url);
+            });
+
+            // Modal List Event Delegations
+            document.getElementById('modal-checklist-container').addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.remove-subtask-btn');
+                if (removeBtn && currentModalMode === 'edit') {
+                    const idx = parseInt(removeBtn.dataset.index, 10);
+                    currentModalChecklist.splice(idx, 1);
+                    renderModalChecklist();
+                }
+            });
+
+            document.getElementById('modal-comments-container').addEventListener('click', (e) => {
+                const editCmBtn = e.target.closest('.edit-comment-btn');
+                if (editCmBtn) {
+                    startEditingComment(editCmBtn.dataset.id);
+                    return;
+                }
+                const delCmBtn = e.target.closest('.delete-comment-btn');
+                if (delCmBtn) {
+                    deleteComment(delCmBtn.dataset.id);
+                    return;
+                }
+            });
+
+            document.getElementById('labels-editor-container').addEventListener('click', (e) => {
+                const removeLabelBtn = e.target.closest('.remove-label-btn');
+                if (removeLabelBtn) {
+                    const row = removeLabelBtn.closest('.label-input-row');
+                    if (row) row.remove();
+                }
+            });
+
+            document.getElementById('labels-editor-container').addEventListener('change', (e) => {
+                const select = e.target.closest('.label-dropdown-select');
+                if (select) {
+                    const row = select.closest('.label-input-row');
+                    const textInput = row.querySelector('.label-name-input');
+                    const colorPicker = row.querySelector('.label-color-picker');
+                    const val = select.value;
+
+                    if (val === 'NEW_LABEL') {
+                        textInput.value = '';
+                        textInput.focus();
+                    } else {
+                        const matched = globalLabels.find(l => l.id === val);
+                        if (matched) {
+                            textInput.value = matched.name;
+                            colorPicker.value = matched.color;
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('links-editor-container').addEventListener('click', (e) => {
+                const removeLinkBtn = e.target.closest('.remove-link-btn');
+                if (removeLinkBtn) {
+                    const row = removeLinkBtn.closest('.link-input-row');
+                    if (row) row.remove();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    closeLabelsManagementModal();
+                }
+            });
+        }
+
+        function toggleCardSubtask(taskId, subtaskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task && task.checklist) {
+                const item = task.checklist.find(c => c.id === subtaskId);
+                if (item) {
+                    item.completed = !item.completed;
+                    saveTasksToStorage();
+                    renderBoard();
+                }
+            }
+        }
+
+        /* ==========================================================================
+           9. Modal Display Mode & Dynamic Form Management
+           ========================================================================== */
+        function setModalDisplayMode(mode) {
+            currentModalMode = mode;
+            const editElems = document.querySelectorAll('#task-modal .edit-mode-elem');
+            const viewElems = document.querySelectorAll('#task-modal .view-mode-elem');
+            const editToggleBtn = document.getElementById('modal-edit-toggle-btn');
+
+            if (mode === 'view') {
+                editElems.forEach(el => el.style.display = 'none');
+                viewElems.forEach(el => el.style.display = 'block');
+                editToggleBtn.style.display = 'inline-flex';
+                editToggleBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Edit`;
+            } else {
+                editElems.forEach(el => el.style.display = '');
+                viewElems.forEach(el => el.style.display = 'none');
+                const taskId = document.getElementById('task-id').value;
+                if (!taskId) {
+                    editToggleBtn.style.display = 'none';
+                } else {
+                    editToggleBtn.style.display = 'inline-flex';
+                    editToggleBtn.innerHTML = `View Card`;
+                }
+            }
+            renderModalChecklist();
+            renderModalLabelsView();
+            renderModalLinksView();
+        }
+
+        function openModal(initialMode = 'create', defaultStatus = null, taskId = null) {
+            const modal = document.getElementById('task-modal');
+            const form = document.getElementById('task-form');
+            const modalTitle = document.getElementById('modal-title-text');
+
+            form.reset();
+            resetCommentEditor();
+
+            const fallbackStatus = defaultStatus || (columns.length > 0 ? columns[0].id : 'todo');
+
+            if (taskId) {
+                const task = tasks.find(t => t.id === taskId);
+                if (!task) return;
+
+                const col = columns.find(c => c.id === task.status);
+
+                document.getElementById('task-id').value = task.id;
+                document.getElementById('task-title-input').value = task.title;
+                document.getElementById('task-priority-input').value = task.priority;
+                document.getElementById('task-status-input').value = task.status;
+                document.getElementById('task-start-input').value = task.startDate || '';
+                document.getElementById('task-due-input').value = task.dueDate || '';
+                document.getElementById('task-notes-editor').innerHTML = cleanHTML(task.notes || '');
+                document.getElementById('modal-hide-completed-toggle').checked = !!task.hideCompleted;
+
+                document.getElementById('view-title').textContent = task.title;
+                document.getElementById('view-priority').textContent = task.priority;
+                document.getElementById('view-status').textContent = col ? col.title : task.status;
+                document.getElementById('view-start-date').textContent = formatDate(task.startDate) || 'None';
+                document.getElementById('view-due-date').textContent = formatDate(task.dueDate) || 'None';
+                document.getElementById('view-notes').innerHTML = cleanHTML(task.notes || '<p style="color:var(--text-muted)">No notes provided.</p>');
+
+                currentModalChecklist = task.checklist ? JSON.parse(JSON.stringify(task.checklist)) : [];
+                currentModalComments = task.comments ? JSON.parse(JSON.stringify(task.comments)) : [];
+                currentModalLinks = task.links ? JSON.parse(JSON.stringify(task.links)) : [];
+                currentModalLabels = task.labels ? JSON.parse(JSON.stringify(task.labels)) : [];
+
+                modalTitle.textContent = initialMode === 'view' ? 'Task Details' : 'Edit Task';
+            } else {
+                modalTitle.textContent = 'New Task';
+                document.getElementById('task-id').value = '';
+                document.getElementById('task-status-input').value = fallbackStatus;
+                document.getElementById('task-notes-editor').innerHTML = '';
+                document.getElementById('modal-hide-completed-toggle').checked = false;
+
+                currentModalChecklist = [];
+                currentModalComments = [];
+                currentModalLinks = [];
+                currentModalLabels = [];
+            }
+
+            renderLabelsEditor();
+            renderLinksEditor();
+            renderModalComments();
+            setModalDisplayMode(initialMode);
+
+            modal.classList.add('active');
+            if (initialMode !== 'view') {
+                setTimeout(() => document.getElementById('task-title-input').focus(), 50);
+            }
+        }
+
+        function closeModal() {
+            const commentEditor = document.getElementById('new-comment-editor');
+            if (commentEditor && commentEditor.textContent.trim() !== '') {
+                saveCommentFromEditor();
+            }
+            document.getElementById('task-modal').classList.remove('active');
+        }
+
+        /* Subtask Checklist Engine */
+        function renderModalChecklist() {
+            const container = document.getElementById('modal-checklist-container');
+            container.innerHTML = '';
+
+            const hideComp = document.getElementById('modal-hide-completed-toggle').checked;
+            const itemsToRender = hideComp ? currentModalChecklist.filter(c => !c.completed) : currentModalChecklist;
+
+            if (itemsToRender.length === 0) {
+                container.innerHTML = `<div style="font-size:0.8rem; color: var(--text-muted); padding: 0.2rem 0;">No subtasks to display.</div>`;
+                return;
+            }
+
+            itemsToRender.forEach((item) => {
+                const realIndex = currentModalChecklist.findIndex(c => c.id === item.id);
+                const row = document.createElement('div');
+                row.className = 'modal-checklist-row';
+
+                if (currentModalMode === 'view') {
+                    row.innerHTML = `
+                        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="currentModalChecklist[${realIndex}].completed = this.checked; saveCurrentChecklistState();">
+                        <span style="font-size: 0.85rem; flex: 1; ${item.completed ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${escapeHTML(item.text)}</span>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="currentModalChecklist[${realIndex}].completed = this.checked">
+                        <input type="text" value="${escapeHTML(item.text)}" onchange="currentModalChecklist[${realIndex}].text = this.value">
+                        <button type="button" class="btn-icon remove-subtask-btn" data-index="${realIndex}" title="Remove item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    `;
+                }
+                container.appendChild(row);
+            });
+        }
+
+        function saveCurrentChecklistState() {
+            const taskId = document.getElementById('task-id').value;
+            if (!taskId) return;
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.checklist = currentModalChecklist;
+                saveTasksToStorage();
+                renderBoard();
+            }
+        }
+
+        function addChecklistItemFromInput() {
+            const input = document.getElementById('new-checklist-input');
+            const text = input.value.trim();
+            if (text) {
+                currentModalChecklist.push({
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+                    text: text,
+                    completed: false
+                });
+                input.value = '';
+                renderModalChecklist();
+            }
+        }
+
+        /* Dynamic Task Labels Engine */
+        function renderLabelsEditor() {
+            const container = document.getElementById('labels-editor-container');
+            container.innerHTML = '';
+            currentModalLabels.forEach(lbl => addLabelRow(lbl.id, lbl.name, lbl.color));
+        }
+
+        function addLabelRow(selectedId = '', name = '', color = '#3b82f6') {
+            const container = document.getElementById('labels-editor-container');
+            const row = document.createElement('div');
+            row.className = 'label-input-row';
+
+            let optionsHTML = `<option value="NEW_LABEL">+ Type New Label</option>`;
+            globalLabels.forEach(gl => {
+                const isSelected = gl.id === selectedId || gl.name.toLowerCase() === name.toLowerCase();
+                optionsHTML += `<option value="${gl.id}" ${isSelected ? 'selected' : ''}>${escapeHTML(gl.name)}</option>`;
+            });
+
+            row.innerHTML = `
+                <select class="form-control label-dropdown-select" style="width: 160px;">${optionsHTML}</select>
+                <input type="text" class="form-control label-name-input" placeholder="Label name" value="${escapeHTML(name)}" style="flex:1;">
+                <input type="color" class="label-color-picker" value="${escapeHTML(color)}">
+                <button type="button" class="btn-icon remove-label-btn" title="Remove Label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        function renderModalLabelsView() {
+            const viewContainer = document.getElementById('view-labels');
+            viewContainer.innerHTML = '';
+
+            if (currentModalLabels.length === 0) {
+                viewContainer.textContent = 'None';
+                return;
+            }
+
+            const labelsWrapper = document.createElement('div');
+            labelsWrapper.className = 'card-labels-container';
+
+            currentModalLabels.forEach(lbl => {
+                labelsWrapper.innerHTML += `<span class="card-label-badge" style="background-color: ${escapeHTML(lbl.color || '#3b82f6')};">${escapeHTML(lbl.name)}</span>`;
+            });
+
+            viewContainer.appendChild(labelsWrapper);
+        }
+
+        /* Dynamic Link Builder Engine */
+        function renderLinksEditor() {
+            const container = document.getElementById('links-editor-container');
+            container.innerHTML = '';
+            currentModalLinks.forEach(link => addLinkRow(link.type, link.url, link.title));
+        }
+
+        function addLinkRow(type = 'doc', url = '', title = '') {
+            const container = document.getElementById('links-editor-container');
+            const row = document.createElement('div');
+            row.className = 'link-input-row';
+
+            let optionsHTML = LINK_TYPES.map(t => `<option value="${t.id}" ${t.id === type ? 'selected' : ''}>${t.label}</option>`).join('');
+
+            row.innerHTML = `
+                <select class="form-control link-type-select" style="width: 140px;">${optionsHTML}</select>
+                <input type="text" class="form-control link-title-input" placeholder="Display Name" value="${escapeHTML(title)}" style="width: 130px;">
+                <input type="text" class="form-control link-url-input" placeholder="URL or path..." value="${escapeHTML(url)}" style="flex:1;">
+                <button type="button" class="btn-icon remove-link-btn" title="Remove Link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        function renderModalLinksView() {
+            const viewContainer = document.getElementById('view-links');
+            viewContainer.innerHTML = '';
+
+            if (currentModalLinks.length === 0) {
+                viewContainer.textContent = 'None';
+                return;
+            }
+
+            const linksWrapper = document.createElement('div');
+            linksWrapper.className = 'task-links-container';
+
+            currentModalLinks.forEach(l => {
+                if (isValidURL(l.url)) {
+                    const typeObj = LINK_TYPES.find(t => t.id === l.type) || LINK_TYPES[0];
+                    const displayName = l.title ? l.title : typeObj.label;
+                    linksWrapper.innerHTML += `
+                        <a href="${escapeHTML(l.url)}" target="_blank" rel="noopener noreferrer" class="link-badge ${typeObj.class}">
+                            🔗 ${escapeHTML(displayName)}
+                        </a>`;
+                }
+            });
+
+            viewContainer.appendChild(linksWrapper);
+        }
+
+        /* Comments Engine */
+        function renderModalComments() {
+            const container = document.getElementById('modal-comments-container');
+            container.innerHTML = '';
+
+            if (currentModalComments.length === 0) {
+                container.innerHTML = `<div style="font-size:0.8rem; color: var(--text-muted); padding: 0.2rem 0;">No comments yet.</div>`;
+                return;
+            }
+
+            currentModalComments.forEach((cm) => {
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.innerHTML = `
+                    <div class="comment-meta">
+                        <span>User • ${escapeHTML(cm.timestamp)}</span>
+                        <div class="comment-actions">
+                            <button class="btn-icon edit-comment-btn" data-id="${cm.id}" title="Edit Comment">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </button>
+                            <button class="btn-icon delete-comment-btn" data-id="${cm.id}" title="Delete Comment">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="comment-text">${cleanHTML(cm.text)}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function startEditingComment(commentId) {
+            const cm = currentModalComments.find(c => c.id === commentId);
+            if (!cm) return;
+
+            editingCommentId = commentId;
+            const editor = document.getElementById('new-comment-editor');
+            editor.innerHTML = cleanHTML(cm.text);
+
+            document.getElementById('save-comment-btn').textContent = 'Update Comment';
+            document.getElementById('cancel-edit-comment-btn').style.display = 'inline-flex';
+            editor.focus();
+        }
+
+        function resetCommentEditor() {
+            editingCommentId = null;
+            document.getElementById('new-comment-editor').innerHTML = '';
+            document.getElementById('save-comment-btn').textContent = 'Save Comment';
+            document.getElementById('cancel-edit-comment-btn').style.display = 'none';
+        }
+
+        function saveCommentFromEditor() {
+            const editor = document.getElementById('new-comment-editor');
+            const rawContent = editor.innerHTML.trim();
+            const textContent = editor.textContent.trim();
+
+            if (textContent !== '') {
+                const now = new Date();
+                const formattedTimestamp = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+                if (editingCommentId) {
+                    const cm = currentModalComments.find(c => c.id === editingCommentId);
+                    if (cm) {
+                        cm.text = cleanHTML(rawContent);
+                        cm.timestamp = formattedTimestamp + ' (edited)';
+                    }
+                } else {
+                    currentModalComments.unshift({
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+                        text: cleanHTML(rawContent),
+                        timestamp: formattedTimestamp
+                    });
+                }
+
+                resetCommentEditor();
+                renderModalComments();
+
+                const taskId = document.getElementById('task-id').value;
+                if (taskId) {
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.comments = currentModalComments;
+                        saveTasksToStorage();
+                        renderBoard();
+                    }
+                }
+            }
+        }
+
+        function deleteComment(commentId) {
+            if (confirm('Delete this comment?')) {
+                currentModalComments = currentModalComments.filter(c => c.id !== commentId);
+                renderModalComments();
+
+                const taskId = document.getElementById('task-id').value;
+                if (taskId) {
+                    const task = tasks.find(t => t.id === taskId);
+                    if (task) {
+                        task.comments = currentModalComments;
+                        saveTasksToStorage();
+                        renderBoard();
+                    }
+                }
+            }
+        }
+
+        /* Save Task Logic */
+        function saveTask(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('task-id').value;
+            const title = document.getElementById('task-title-input').value.trim();
+            const priority = document.getElementById('task-priority-input').value;
+            const status = document.getElementById('task-status-input').value;
+            const startDate = document.getElementById('task-start-input').value;
+            const dueDate = document.getElementById('task-due-input').value;
+            const notes = cleanHTML(document.getElementById('task-notes-editor').innerHTML);
+            const hideCompleted = document.getElementById('modal-hide-completed-toggle').checked;
+
+            if (!title) return;
+
+            // Extract custom labels
+            const labelRows = document.querySelectorAll('#labels-editor-container .label-input-row');
+            const extractedLabels = [];
+            
+            labelRows.forEach(row => {
+                const selectVal = row.querySelector('.label-dropdown-select').value;
+                const name = row.querySelector('.label-name-input').value.trim();
+                const color = row.querySelector('.label-color-picker').value;
+
+                if (name) {
+                    if (selectVal !== 'NEW_LABEL') {
+                        extractedLabels.push({ id: selectVal, name, color });
+                    } else {
+                        // Register newly typed label into global repository
+                        let existingGlobal = globalLabels.find(g => g.name.toLowerCase() === name.toLowerCase());
+                        if (existingGlobal) {
+                            extractedLabels.push({ ...existingGlobal, color });
+                        } else {
+                            const newGlobalId = 'lbl_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 3);
+                            const newLblObj = { id: newGlobalId, name, color };
+                            globalLabels.push(newLblObj);
+                            extractedLabels.push(newLblObj);
+                        }
+                    }
+                }
+            });
+
+            saveLabelsToStorage();
+
+            // Extract resource links
+            const linkRows = document.querySelectorAll('#links-editor-container .link-input-row');
+            const extractedLinks = [];
+            linkRows.forEach(row => {
+                const type = row.querySelector('.link-type-select').value;
+                const linkTitle = row.querySelector('.link-title-input').value.trim();
+                const url = row.querySelector('.link-url-input').value.trim();
+                if (url && isValidURL(url)) {
+                    extractedLinks.push({ type, title: linkTitle, url });
+                }
+            });
+
+            const cleanedChecklist = currentModalChecklist.filter(item => item.text.trim() !== '');
+
+            if (id) {
+                const taskIndex = tasks.findIndex(t => t.id === id);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex] = {
+                        ...tasks[taskIndex],
+                        title,
+                        notes,
+                        priority,
+                        status,
+                        startDate,
+                        dueDate,
+                        hideCompleted,
+                        labels: extractedLabels,
+                        links: extractedLinks,
+                        checklist: cleanedChecklist,
+                        comments: currentModalComments
+                    };
+                }
+            } else {
+                const newTask = {
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                    title,
+                    notes,
+                    priority,
+                    status,
+                    startDate,
+                    dueDate,
+                    hideCompleted,
+                    labels: extractedLabels,
+                    links: extractedLinks,
+                    checklist: cleanedChecklist,
+                    comments: currentModalComments
+                };
+                tasks.push(newTask);
+            }
+
+            saveTasksToStorage();
+            renderBoard();
+            closeModal();
+        }
+
+        function deleteTask(id) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasksToStorage();
+                renderBoard();
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const parts = dateString.split('-');
+            if (parts.length !== 3) return dateString;
+            const date = new Date(parts[0], parts[1] - 1, parts[2]);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+    </script>
+</body>
+</html>
