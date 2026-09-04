@@ -1,4 +1,4 @@
-# get-shit-done
+# *Get Shit Done* - the Kanban Board
 a personal kanban board that stores user data in a local json; can be used for backup.
 - editable columns, task cards, labels, comments
 - configurable priority labels, resource links and subtask checklists
