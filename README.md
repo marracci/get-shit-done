@@ -4,6 +4,16 @@ a personal kanban board that stores user data in a local json; can be used for b
 - configurable priority labels, resource links and subtask checklists
 - dark and light mode
 - all entry data can be saved locally to a json file. if browser cache cleared, user can re-load data from json
+
+**How To Use**
+During initial setup:
+- update your column names, add in your cards, subtasks etc.
+- Choose "Save File" button at top of board to generate your local user data file (json). This will store all of your entries and configurations locally on your device.
+
+**Daily Use**
+- be sure to save your user data daily/regularly
+- if you clear your browser cache intentionally or otherwise, simply open the Get Shit Done kanban board and choose the "Open File" button at the top of board. Navigate to your saved json and it will re-load your user data stored in that file.
+
 ----------
 ![Kanban Board view](/Kanban-Board-example1.png)
 ----------
